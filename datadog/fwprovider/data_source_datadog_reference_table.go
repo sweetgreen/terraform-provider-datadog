@@ -32,6 +32,17 @@ type referenceTableDataSourceModel struct {
 	UpdatedAt     types.String `tfsdk:"updated_at"`
 }
 
+// Reuse the same model types from the resource for consistency
+type referenceTableSchemaModelDataSource struct {
+	Fields      types.List `tfsdk:"fields"`
+	PrimaryKeys types.List `tfsdk:"primary_keys"`
+}
+
+type referenceTableSchemaFieldModelDataSource struct {
+	Name types.String `tfsdk:"name"`
+	Type types.String `tfsdk:"type"`
+}
+
 type referenceTableDataSource struct {
 	Api  *datadogV2.ReferenceTablesApi
 	Auth context.Context
@@ -255,9 +266,9 @@ func (d *referenceTableDataSource) Read(ctx context.Context, request datasource.
 		if attrs.HasSchema() {
 			respSchema := attrs.GetSchema()
 			respFields := respSchema.GetFields()
-			fields := make([]referenceTableSchemaFieldModel, len(respFields))
+			fields := make([]referenceTableSchemaFieldModelDataSource, len(respFields))
 			for i, field := range respFields {
-				fields[i] = referenceTableSchemaFieldModel{
+				fields[i] = referenceTableSchemaFieldModelDataSource{
 					Name: types.StringValue(field.GetName()),
 					Type: types.StringValue(string(field.GetType())),
 				}
@@ -288,7 +299,7 @@ func (d *referenceTableDataSource) Read(ctx context.Context, request datasource.
 				"primary_keys": types.ListType{ElemType: types.StringType},
 			}
 
-			schemaObj, diagsObj := types.ObjectValueFrom(ctx, schemaAttrTypes, referenceTableSchemaModel{
+			schemaObj, diagsObj := types.ObjectValueFrom(ctx, schemaAttrTypes, referenceTableSchemaModelDataSource{
 				Fields:      fieldsList,
 				PrimaryKeys: primaryKeysList,
 			})

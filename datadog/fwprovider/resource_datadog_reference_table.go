@@ -57,10 +57,20 @@ type referenceTableFileMetadataModel struct {
 }
 
 type referenceTableAccessDetailsModel struct {
-	Type       types.String `tfsdk:"type"`
-	Region     types.String `tfsdk:"region"`
-	BucketName types.String `tfsdk:"bucket_name"`
-	KeyPath    types.String `tfsdk:"key_path"`
+	// AWS S3 fields
+	AwsAccountId  types.String `tfsdk:"aws_account_id"`
+	AwsBucketName types.String `tfsdk:"aws_bucket_name"`
+	// GCP Storage fields
+	GcpProjectId           types.String `tfsdk:"gcp_project_id"`
+	GcpBucketName          types.String `tfsdk:"gcp_bucket_name"`
+	GcpServiceAccountEmail types.String `tfsdk:"gcp_service_account_email"`
+	// Azure Storage fields
+	AzureClientId           types.String `tfsdk:"azure_client_id"`
+	AzureContainerName      types.String `tfsdk:"azure_container_name"`
+	AzureStorageAccountName types.String `tfsdk:"azure_storage_account_name"`
+	AzureTenantId           types.String `tfsdk:"azure_tenant_id"`
+	// Common field
+	FilePath types.String `tfsdk:"file_path"`
 }
 
 type referenceTableResource struct {
@@ -139,24 +149,52 @@ func (r *referenceTableResource) Schema(_ context.Context, _ resource.SchemaRequ
 						},
 					},
 					"access_details": schema.SingleNestedAttribute{
-						Description: "Details for accessing a file in cloud storage. Use this for S3, GCS, or AZURE source types.",
+						Description: "Details for accessing a file in cloud storage. Use this for S3, GCS, or AZURE source types. Provide the fields specific to your cloud provider.",
 						Optional:    true,
 						Attributes: map[string]schema.Attribute{
-							"type": schema.StringAttribute{
-								Description: "Type of cloud storage. Valid values are `s3`, `gcs`, `azure`.",
-								Required:    true,
-							},
-							"region": schema.StringAttribute{
-								Description: "Region where the bucket is located (for S3).",
+							// AWS S3 fields
+							"aws_account_id": schema.StringAttribute{
+								Description: "AWS account ID where the S3 bucket is located. Required for S3 source.",
 								Optional:    true,
 							},
-							"bucket_name": schema.StringAttribute{
-								Description: "Name of the storage bucket.",
-								Required:    true,
+							"aws_bucket_name": schema.StringAttribute{
+								Description: "S3 bucket name containing the CSV file. Required for S3 source.",
+								Optional:    true,
 							},
-							"key_path": schema.StringAttribute{
-								Description: "Path to the CSV file within the bucket.",
-								Required:    true,
+							// GCP Storage fields
+							"gcp_project_id": schema.StringAttribute{
+								Description: "GCP project ID where the bucket is located. Required for GCS source.",
+								Optional:    true,
+							},
+							"gcp_bucket_name": schema.StringAttribute{
+								Description: "GCS bucket name containing the CSV file. Required for GCS source.",
+								Optional:    true,
+							},
+							"gcp_service_account_email": schema.StringAttribute{
+								Description: "Service account email with read permissions for the GCS bucket. Required for GCS source.",
+								Optional:    true,
+							},
+							// Azure Storage fields
+							"azure_client_id": schema.StringAttribute{
+								Description: "Azure service principal (application) client ID with permissions to read from the container. Required for Azure source.",
+								Optional:    true,
+							},
+							"azure_container_name": schema.StringAttribute{
+								Description: "Azure Blob Storage container name containing the CSV file. Required for Azure source.",
+								Optional:    true,
+							},
+							"azure_storage_account_name": schema.StringAttribute{
+								Description: "Azure storage account name where the container is located. Required for Azure source.",
+								Optional:    true,
+							},
+							"azure_tenant_id": schema.StringAttribute{
+								Description: "Azure Active Directory tenant ID. Required for Azure source.",
+								Optional:    true,
+							},
+							// Common field
+							"file_path": schema.StringAttribute{
+								Description: "The relative file path from the bucket/container root to the CSV file. Required for all cloud storage sources.",
+								Optional:    true,
 							},
 						},
 					},
@@ -385,14 +423,39 @@ func (r *referenceTableResource) buildCreateRequest(ctx context.Context, state *
 			return nil, diags
 		}
 
-		accessDetails := datadogV2.NewCreateTableRequestDataAttributesFileMetadataOneOfAccessDetails(
-			accessDetailsModel.BucketName.ValueString(),
-			accessDetailsModel.KeyPath.ValueString(),
-			accessDetailsModel.Type.ValueString(),
-		)
+		accessDetails := datadogV2.NewCreateTableRequestDataAttributesFileMetadataOneOfAccessDetails()
 
-		if !accessDetailsModel.Region.IsNull() && !accessDetailsModel.Region.IsUnknown() {
-			accessDetails.SetRegion(accessDetailsModel.Region.ValueString())
+		// Determine which cloud provider based on which fields are set
+		if !accessDetailsModel.AwsAccountId.IsNull() && !accessDetailsModel.AwsAccountId.IsUnknown() {
+			// AWS S3
+			awsDetail := datadogV2.NewCreateTableRequestDataAttributesFileMetadataOneOfAccessDetailsAwsDetail(
+				accessDetailsModel.AwsAccountId.ValueString(),
+				accessDetailsModel.AwsBucketName.ValueString(),
+				accessDetailsModel.FilePath.ValueString(),
+			)
+			accessDetails.SetAwsDetail(*awsDetail)
+		} else if !accessDetailsModel.GcpProjectId.IsNull() && !accessDetailsModel.GcpProjectId.IsUnknown() {
+			// GCP Storage
+			gcpDetail := datadogV2.NewCreateTableRequestDataAttributesFileMetadataOneOfAccessDetailsGcpDetail(
+				accessDetailsModel.FilePath.ValueString(),
+				accessDetailsModel.GcpBucketName.ValueString(),
+				accessDetailsModel.GcpProjectId.ValueString(),
+				accessDetailsModel.GcpServiceAccountEmail.ValueString(),
+			)
+			accessDetails.SetGcpDetail(*gcpDetail)
+		} else if !accessDetailsModel.AzureStorageAccountName.IsNull() && !accessDetailsModel.AzureStorageAccountName.IsUnknown() {
+			// Azure Storage
+			azureDetail := datadogV2.NewCreateTableRequestDataAttributesFileMetadataOneOfAccessDetailsAzureDetail(
+				accessDetailsModel.AzureClientId.ValueString(),
+				accessDetailsModel.AzureContainerName.ValueString(),
+				accessDetailsModel.AzureStorageAccountName.ValueString(),
+				accessDetailsModel.AzureTenantId.ValueString(),
+				accessDetailsModel.FilePath.ValueString(),
+			)
+			accessDetails.SetAzureDetail(*azureDetail)
+		} else {
+			diags.AddError("invalid access_details", "must specify either AWS (aws_account_id, aws_bucket_name), GCP (gcp_project_id, gcp_bucket_name, gcp_service_account_email), or Azure (azure_client_id, azure_container_name, azure_storage_account_name, azure_tenant_id) fields along with file_path")
+			return nil, diags
 		}
 
 		cloudStorage := datadogV2.NewCreateTableRequestDataAttributesFileMetadataCloudStorage(*accessDetails, true)

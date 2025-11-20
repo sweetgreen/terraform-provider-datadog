@@ -124,14 +124,14 @@ resource "datadog_reference_table" "test" {
       name = "value"
       type = "DOUBLE"
     }
+    primary_keys = ["id"]
   }
 
   file_metadata {
     access_details {
-      type        = "s3"
-      bucket_name = "my-test-bucket"
-      key_path    = "reference-tables/test-data.csv"
-      region      = "us-east-1"
+      aws_account_id  = "123456789012"
+      aws_bucket_name = "my-test-bucket"
+      file_path       = "reference-tables/test-data.csv"
     }
   }
 
@@ -163,14 +163,14 @@ resource "datadog_reference_table" "test" {
       name = "enabled"
       type = "BOOLEAN"
     }
+    primary_keys = ["id"]
   }
 
   file_metadata {
     access_details {
-      type        = "s3"
-      bucket_name = "my-test-bucket"
-      key_path    = "reference-tables/test-data.csv"
-      region      = "us-east-1"
+      aws_account_id  = "123456789012"
+      aws_bucket_name = "my-test-bucket"
+      file_path       = "reference-tables/test-data.csv"
     }
   }
 
