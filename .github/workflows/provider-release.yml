@@ -2,6 +2,8 @@ name: Terraform Provider Release
 
 on:
   push:
+    branches:
+      - noticket/create-build
     tags:
       - 'v*'
   workflow_dispatch:
