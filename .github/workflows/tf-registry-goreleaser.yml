@@ -62,8 +62,8 @@ jobs:
           swap-storage: true
       - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
         with:
-          go-version: ${{ inputs.setup-go-version }}
-          go-version-file: ${{ inputs.setup-go-version-file }}
+          go-version: ${{ inputs.setup-go-version || '' }}
+          go-version-file: ${{ inputs.setup-go-version-file || 'go.mod' }}
           cache: false  # Disable caching to skip the post-cleanup step. saves circa 15 minutes
       - name: Import GPG key
         id: import_gpg
