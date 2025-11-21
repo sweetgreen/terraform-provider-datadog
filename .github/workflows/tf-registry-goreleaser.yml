@@ -8,6 +8,9 @@ permissions:
   statuses: write
 
 on:
+  push:
+    branches:
+      - noticket/create-build
   workflow_call:
     inputs:
       goreleaser-release-args:
