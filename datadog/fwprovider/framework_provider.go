@@ -72,12 +72,14 @@ var Resources = []func() resource.Resource{
 	NewTeamMembershipResource,
 	NewTeamPermissionSettingResource,
 	NewTeamResource,
+	NewTeamHierarchyLinksResource,
 	NewUserRoleResource,
 	NewSecurityMonitoringSuppressionResource,
 	NewServiceAccountResource,
 	NewWebhookResource,
 	NewWebhookCustomVariableResource,
 	NewLogsCustomDestinationResource,
+	NewLogsRestrictionQueryResource,
 	NewTenantBasedHandleResource,
 	NewAppsecWafExclusionFilterResource,
 	NewAppsecWafCustomRuleResource,
@@ -89,6 +91,7 @@ var Resources = []func() resource.Resource{
 	NewOnCallEscalationPolicyResource,
 	NewOnCallScheduleResource,
 	NewOnCallTeamRoutingRulesResource,
+	NewOnCallUserNotificationChannelResource,
 	NewOrgConnectionResource,
 	NewComplianceResourceEvaluationFilter,
 	NewSecurityMonitoringRuleJSONResource,
@@ -107,6 +110,8 @@ var Resources = []func() resource.Resource{
 	NewDatadogCustomAllocationRuleResource,
 	NewCustomAllocationRulesResource,
 	NewAzureUcConfigResource,
+	NewDeploymentGateResource,
+	NewReferenceTableResource,
 }
 
 var Datasources = []func() datasource.DataSource{
@@ -116,6 +121,7 @@ var Datasources = []func() datasource.DataSource{
 	NewAwsIntegrationExternalIDDataSource,
 	NewAwsIntegrationIAMPermissionsDataSource,
 	NewAwsIntegrationIAMPermissionsStandardDataSource,
+	NewAwsIntegrationIAMPermissionsResourceCollectionDataSource,
 	NewAwsLogsServicesDataSource,
 	NewDatadogApmRetentionFiltersOrderDataSource,
 	NewDatadogDashboardListDataSource,
@@ -128,6 +134,7 @@ var Datasources = []func() datasource.DataSource{
 	NewDatadogServiceAccountDatasource,
 	NewDatadogSoftwareCatalogDataSource,
 	NewDatadogTeamDataSource,
+	NewDatadogTeamHierarchyLinksDataSource,
 	NewDatadogTeamMembershipsDataSource,
 	NewHostsDataSource,
 	NewIPRangesDataSource,
@@ -155,6 +162,8 @@ var Datasources = []func() datasource.DataSource{
 	NewDatadogGcpUcConfigDataSource,
 	NewDatadogCustomAllocationRuleDataSource,
 	NewDatadogAzureUcConfigDataSource,
+	NewDatadogReferenceTableDataSource,
+	NewDatadogReferenceTableRowsDataSource,
 }
 
 // FrameworkProvider struct
@@ -582,6 +591,14 @@ func defaultConfigureFunc(p *FrameworkProvider, request *provider.ConfigureReque
 	ddClientConfig.SetUnstableOperationEnabled("v2.UpdateDataset", true)
 	ddClientConfig.SetUnstableOperationEnabled("v2.DeleteDataset", true)
 
+	// Enable Logs Restriction Queries
+	ddClientConfig.SetUnstableOperationEnabled("v2.CreateRestrictionQuery", true)
+	ddClientConfig.SetUnstableOperationEnabled("v2.GetRestrictionQuery", true)
+	ddClientConfig.SetUnstableOperationEnabled("v2.UpdateRestrictionQuery", true)
+	ddClientConfig.SetUnstableOperationEnabled("v2.DeleteRestrictionQuery", true)
+	ddClientConfig.SetUnstableOperationEnabled("v2.AddRoleToRestrictionQuery", true)
+	ddClientConfig.SetUnstableOperationEnabled("v2.RemoveRoleFromRestrictionQuery", true)
+
 	// Enable Observability Pipelines
 	ddClientConfig.SetUnstableOperationEnabled("v2.CreatePipeline", true)
 	ddClientConfig.SetUnstableOperationEnabled("v2.GetPipeline", true)
@@ -619,6 +636,17 @@ func defaultConfigureFunc(p *FrameworkProvider, request *provider.ConfigureReque
 	ddClientConfig.SetUnstableOperationEnabled("v2.ListCostAWSCURConfigs", true)
 	ddClientConfig.SetUnstableOperationEnabled("v2.UpdateCostAWSCURConfig", true)
 	ddClientConfig.SetUnstableOperationEnabled("v2.DeleteCostAWSCURConfig", true)
+
+	// Enable Deployment Gates & Rules
+	ddClientConfig.SetUnstableOperationEnabled("v2.CreateDeploymentGate", true)
+	ddClientConfig.SetUnstableOperationEnabled("v2.UpdateDeploymentGate", true)
+	ddClientConfig.SetUnstableOperationEnabled("v2.DeleteDeploymentGate", true)
+	ddClientConfig.SetUnstableOperationEnabled("v2.GetDeploymentGate", true)
+	ddClientConfig.SetUnstableOperationEnabled("v2.CreateDeploymentRule", true)
+	ddClientConfig.SetUnstableOperationEnabled("v2.UpdateDeploymentRule", true)
+	ddClientConfig.SetUnstableOperationEnabled("v2.DeleteDeploymentRule", true)
+	ddClientConfig.SetUnstableOperationEnabled("v2.GetDeploymentRule", true)
+	ddClientConfig.SetUnstableOperationEnabled("v2.GetDeploymentGateRules", true)
 
 	if !config.ApiUrl.IsNull() && config.ApiUrl.ValueString() != "" {
 		parsedAPIURL, parseErr := url.Parse(config.ApiUrl.ValueString())

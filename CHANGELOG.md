@@ -1,3 +1,82 @@
+## 3.84.0 (January 8, 2026)
+
+### BUGFIXES
+* [datadog_software_catalog] Fix software_catalog resource to handle empty API responses for deleted entities by @KruthiVuppala in https://github.com/DataDog/terraform-provider-datadog/pull/3371
+* [datadog_csm_threat_agent] fix multiple actions support by @safchain in https://github.com/DataDog/terraform-provider-datadog/pull/3375
+* [datadog_security_monitoring_rule] Replace security monitoring rules with an updated detection method by @paul-hf in https://github.com/DataDog/terraform-provider-datadog/pull/3392
+### IMPROVEMENTS
+* [datadog_csm_threats_agent_rule] add silent attribute to rules by @safchain in https://github.com/DataDog/terraform-provider-datadog/pull/3380
+### FEATURES
+* [datadog_observability_pipeline] Add processor groups instead of standalone processors by @vladimir-dd in https://github.com/DataDog/terraform-provider-datadog/pull/3346
+* [datadog_deployment_gate] Add deployment gates terraform provider by @Aaron-9900 in https://github.com/DataDog/terraform-provider-datadog/pull/3286
+* [datadog_dashboard] Add semantic_mode support to metric queries by @brtu in https://github.com/DataDog/terraform-provider-datadog/pull/3356
+* [datadog_observability_pipeline] Add `display_name` for processors and processor groups by @vladimir-dd in https://github.com/DataDog/terraform-provider-datadog/pull/3377
+* [datadog_security_monitoring_rule] Add anomaly detection options to security monitoring rule resource by @paul-hf in https://github.com/DataDog/terraform-provider-datadog/pull/3376
+* [datadog_security_monitoring_rule] Add instantaneous baseline option to NewValue by @hachem-dd in https://github.com/DataDog/terraform-provider-datadog/pull/3400
+### NOTES
+* Remove note about log index deletion not being supported by @kelly-kong-ddog in https://github.com/DataDog/terraform-provider-datadog/pull/3373
+
+## New Contributors
+* @KruthiVuppala made their first contribution in https://github.com/DataDog/terraform-provider-datadog/pull/3371
+* @Aaron-9900 made their first contribution in https://github.com/DataDog/terraform-provider-datadog/pull/3286
+* @kelly-kong-ddog made their first contribution in https://github.com/DataDog/terraform-provider-datadog/pull/3373
+* @hachem-dd made their first contribution in https://github.com/DataDog/terraform-provider-datadog/pull/3400
+
+**Full Changelog**: https://github.com/DataDog/terraform-provider-datadog/compare/v3.83.0...v3.84.0
+
+## 3.83.0 (December 18, 2025)
+
+### BUGFIXES
+* [datadog_security_monitoring] Fix how tags and calculated fields array are handled by @clementgbcn in https://github.com/DataDog/terraform-provider-datadog/pull/3347
+* [datadog_security_monitoring] Fix missing group_signals_by in rules by @clementgbcn in https://github.com/DataDog/terraform-provider-datadog/pull/3365
+### IMPROVEMENTS
+* [datadog_sensitive_data_scanner_rule] drop ForceNew from included_keyword_configuration by @OBe95 in https://github.com/DataDog/terraform-provider-datadog/pull/3355
+* [datadog_cost_budget] Add Validation for terraform plan by @zeinageb in https://github.com/DataDog/terraform-provider-datadog/pull/3349
+### FEATURES
+* [datadog_integration_aws_iam_permissions_resource_collection] Add new data source for AWS Integration resource collection IAM permissions by @raymondeah in https://github.com/DataDog/terraform-provider-datadog/pull/3265
+* [datadog_monitor_notification_rule] Add support for scope and conditional_recipients by @shaneyuandd in https://github.com/DataDog/terraform-provider-datadog/pull/3363
+* [datadog_resource_datadog_monitor] Add Support for Saving Assets to Monitors by @kevinpombo-datadog in https://github.com/DataDog/terraform-provider-datadog/pull/3334
+* [datadog_logs_restriction_query] Add LRQ Terraform Resource by @dwijetunga in https://github.com/DataDog/terraform-provider-datadog/pull/3352
+
+## New Contributors
+* @OBe95 made their first contribution in https://github.com/DataDog/terraform-provider-datadog/pull/3355
+* @dwijetunga made their first contribution in https://github.com/DataDog/terraform-provider-datadog/pull/3352
+
+**Full Changelog**: https://github.com/DataDog/terraform-provider-datadog/compare/v3.82.0...v3.83.0
+
+## 3.82.0 (December 10, 2025)
+
+### BUGFIXES
+* [datadog_cost_budget] Fix update creating duplicate instead of updating existing by @zeinageb in https://github.com/DataDog/terraform-provider-datadog/pull/3341
+### FEATURES
+* [datadog_custom_allocation_rules] add the functionality to allow users decide custom allocation rule reorder behaviors by @congx4 in https://github.com/DataDog/terraform-provider-datadog/pull/3324
+* [datadog_reference_table] Add terraform support for reference tables by @g-brizolier in https://github.com/DataDog/terraform-provider-datadog/pull/3317
+* [datadog_team_hierarchy_links] Add TF provider for team hierarchy links by @dshivara in https://github.com/DataDog/terraform-provider-datadog/pull/3348
+
+## New Contributors
+* @zeinageb made their first contribution in https://github.com/DataDog/terraform-provider-datadog/pull/3341
+* @dshivara made their first contribution in https://github.com/DataDog/terraform-provider-datadog/pull/3358
+* @g-brizolier made their first contribution in https://github.com/DataDog/terraform-provider-datadog/pull/3317
+
+**Full Changelog**: https://github.com/DataDog/terraform-provider-datadog/compare/v3.81.0...v3.82.0
+
+## 3.81.0 (November 20, 2025)
+
+### BUGFIXES
+* [datadog_agentless_scanning_gcp_scan_options] Better support of resource conflict in agentless GCP scan options TF provider by @mohamed-challal in https://github.com/DataDog/terraform-provider-datadog/pull/3328
+* [datadog_security_monitoring_suppression] Fix issue when dealing with empty array of tags in Rules by @clementgbcn in https://github.com/DataDog/terraform-provider-datadog/pull/3331
+* [datadog_observability_pipeline] make google auth optional by @vladimir-dd in https://github.com/DataDog/terraform-provider-datadog/pull/3332
+### FEATURES
+* [datadog_tag_pipeline_rulesets] add the functionality to allow users decide tag pipeline reorder behaviors by @congx4 in https://github.com/DataDog/terraform-provider-datadog/pull/3320
+* [datadog_user] Add new exclude_service_accounts attribute to the datadog_user ds by @tquidetdd in https://github.com/DataDog/terraform-provider-datadog/pull/3323
+* [datadog_metrics] add 'datadog_metrics' data source by @mdb in https://github.com/DataDog/terraform-provider-datadog/pull/3214
+
+## New Contributors
+* @mfu00 made their first contribution in https://github.com/DataDog/terraform-provider-datadog/pull/3330
+* @mgaonach made their first contribution in https://github.com/DataDog/terraform-provider-datadog/pull/3327
+
+**Full Changelog**: https://github.com/DataDog/terraform-provider-datadog/compare/v3.80.0...v3.81.0
+
 ## 3.80.0 (November 12, 2025)
 
 ### BUGFIXES
